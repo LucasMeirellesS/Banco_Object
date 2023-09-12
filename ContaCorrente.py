@@ -1,5 +1,5 @@
 from datetime import datetime
-
+from random import randint
 
 class ContaCorrente:
 
@@ -16,6 +16,7 @@ class ContaCorrente:
         self.__agencia = agencia
         self.__num_conta = num_conta
         self.__transacoes = []
+        self.cartoes = []
 
 
     @property
@@ -66,11 +67,19 @@ class ContaCorrente:
     def num_conta(self, num_conta:str):
         self.__num_conta = num_conta
 
+    '''def registra_card(self, cartao):
+        self.__cartoes.append(cartao)'''
+
     def consultar_historico_transacoes(self):
         print('Histórico de Transações:')
         print('Valor, Saldo, Data e Hora')
         for transacao in self.__transacoes:
             print(transacao)
+
+    def consultar_cartoes(self):
+        print('Cartões:')
+        for cartao in self.cartoes:
+            print(cartao.__dict__)
 
 
     def _registra_transacao(self, transacao):
@@ -124,17 +133,33 @@ class ContaCorrente:
         else:
             self._add_transacao(valor, tipo=2)
 
-
-
     def transferir(self, valor, conta):
         self.sacar(valor=valor, transferencia= True, conta=conta)
         conta.depositar(valor=valor, recebimento= True, conta=self)
 
 
-# Programa
-conta1 = ContaCorrente("Zé", "044-744-895.65", "5555-111", "55559999", 60000, -500000)
-conta2 = ContaCorrente("Chico", "555-789-541.99", "6666-555", "48484546", 80000, -500000)
+class CartaoCredito:
+    @staticmethod
+    def _data_hora():
+        horario_BR = datetime.now()
+        return horario_BR
 
-conta1.transferir(500, conta= conta2)
+    def __init__(self, numero, conta_corrente):
+        self.numero = f"{randint(0,9)}{randint(0,9)}{randint(0,9)}{randint(0,9)} {randint(0,9)}{randint(0,9)}{randint(0,9)}{randint(0,9)} " \
+                      f"{randint(0,9)}{randint(0,9)}{randint(0,9)}{randint(0,9)} {randint(0,9)}{randint(0,9)}{randint(0,9)}{randint(0,9)}"
+        self.titular = conta_corrente.nome
+        self.limite = 1000
+        self.validade = f"{CartaoCredito._data_hora().month}/{CartaoCredito._data_hora().year + 4}"
+        self.cod_seguranca = f"{randint(0,9)}{randint(0,9)}{randint(0,9)}"
+        self.conta_corrente = conta_corrente
+        conta_corrente.cartoes.append(self)
 
-conta1.consultar_historico_transacoes()
+
+
+    
+
+conta1 = ContaCorrente("Zé", "044-744-895.65", "5555-111", "55559999")
+cartao1 = CartaoCredito("Lucas", conta1)
+
+print(cartao1.conta_corrente.num_conta)
+conta1.consultar_cartoes()
