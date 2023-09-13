@@ -39,17 +39,10 @@ class ContaCorrente:
     def saldo(self):
         return self.__saldo
 
-    @saldo.setter
-    def saldo(self, saldo:float):
-        self.__saldo = saldo
 
     @property
     def limite(self):
         return self.__limite
-
-    @limite.setter
-    def limite(self, limite:float):
-        self.__limite = limite
 
     @property
     def agencia(self):
@@ -81,6 +74,17 @@ class ContaCorrente:
         for cartao in self.cartoes:
             print(cartao.__dict__)
 
+    def _subtrair(self, valor):
+        self.__saldo -= valor
+
+    def _somar(self, valor):
+        self.__saldo += valor
+
+    def altera_saldo(self, valor, op=None):
+        if op is not None and op == 1:
+            self.somar(valor)
+        elif op is not None and op == 2:
+            self.subtrair(valor)
 
     def _registra_transacao(self, transacao):
         self.__transacoes.append(transacao)
@@ -120,14 +124,14 @@ class ContaCorrente:
             print(f"Valor acima do limite da conta!")
 
         else:
-            self.saldo -= valor
+            self.altera_saldo(valor, 2)
             if transferencia is True:
                 self._add_transacao(valor, tipo=3, conta= conta)
             else:
                 self._add_transacao(valor, tipo=1)
 
     def depositar(self, valor:float, recebimento = False, conta=None):
-        self.saldo += valor
+        self.altera_saldo(valor, 1)
         if recebimento is True:
             self._add_transacao(valor, tipo=4, conta = conta)
         else:
@@ -150,16 +154,20 @@ class CartaoCredito:
         self.titular = conta_corrente.nome
         self.limite = 1000
         self.validade = f"{CartaoCredito._data_hora().month}/{CartaoCredito._data_hora().year + 4}"
+        self.__senha = "1234"
         self.cod_seguranca = f"{randint(0,9)}{randint(0,9)}{randint(0,9)}"
         self.conta_corrente = conta_corrente
         conta_corrente.cartoes.append(self)
 
+    @property
+    def senha(self):
+        return self.__senha
 
-
+    @senha.setter
+    def senha(self, senha):
+        if len(senha) == 4 and senha.isnumeric():
+            self.__senha = senha
+        else:
+            print("Nova senha inválida")
     
 
-conta1 = ContaCorrente("Zé", "044-744-895.65", "5555-111", "55559999")
-cartao1 = CartaoCredito("Lucas", conta1)
-
-print(cartao1.conta_corrente.num_conta)
-conta1.consultar_cartoes()
